@@ -1,0 +1,91 @@
+---
+title: "CRIM 595 Project Template"
+author: "Your Name"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+Here's a collection of text formatting/styling things you may (or may not) care about. Copy them, use them, or delete them, just don't leave all of this here when you submit your project...
+
+There's a [useful link here](https://www.rforecology.com/post/how-to-use-rmarkdown-part-one/).
+
+And here's [another one](https://sage-fenglisu-c38dfb.netlify.app/). 
+
+Both of the examples above show you how to hyperlink text. That's useful when you want to cite something, without providing the URL in the text.
+
+These are different heading styles. When you 'knit' this template, you see how they differ:
+
+# Heading 1
+## Heading 2
+### Heading 3
+#### Heading 4
+##### Heading 5
+###### Heading 6
+
+### *Italics*
+### **Bold**
+### ***Bold Italicized**
+
+1. Numbered
+2. List
+3. Like
+4. This
+
+* bullet points
+- work
+* like this
+- or this
+
+*When you are ready to see what the output looks like*, **click the 'Knit' button.** The output file will be saved to the same folder this script is saved to.
+
+# Example Section
+```{r, echo=FALSE, message=FALSE, results='hide'}
+# when you set 'echo' to false, you are hiding the block of code 
+# when you set 'message' to false, you are hiding the console text that comes after running your code
+# when you set 'results' to hide, you are hiding extra processing that occasionally shows up in the console
+```
+See how the chunk of code above doesn't show up in the knitted output? It's magic, really.
+
+# PACKAGES
+```{r}
+#install.packages('tidyverse')
+library(tidyverse)
+```
+**NOTE:** *Never ever ever include any install.packages functions.* Either comment them out with a #, or delete them.
+
+Also, if we had used the message=FALSE here, all that extra stuff would not have displayed in the knit.
+
+# SOURCES
+```{r}
+# Data source link here 
+```
+A completely optional section for any data source references.
+
+## Acquire Data
+```{r}
+# Code here
+```
+Often, this is the section where you include how you got the data.
+
+## Wrangle Data
+```{r}
+# more code heree
+```
+This is typically where any processing, extracting, and/or formatting occurs.
+
+## Calculate Data
+```{r}
+# more code
+```
+This can be the place where math is done. **Wrangle** and **Calculate** can often be one section, too.
+
+## Visualize Data
+```{r}
+# yep, more code, but with graphs
+```
+A place for graphs, maps, etc.
+
+# ANALYTICS
+Insert text here for your actual findings and results. You can also insert text above/below visualizations along the way.
+
+**NOTE:** When submitting your projects, you are submitting either an **HTML** or **PDF** output of your Markdown file. Blackboard does not accept HTML files, so if you go that route (*and I recommend it, really*), [email me](mailto:mdanna2@gmu.edu) a copy of your final submission.
