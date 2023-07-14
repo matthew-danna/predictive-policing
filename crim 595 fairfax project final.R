@@ -1,9 +1,9 @@
 ### Packages
-#install.packages('googlesheets4')
-#install.packages('tidyverse')
-#install.packages('leaflet')
-#install.packages('sf')
-#install.packages('tigris')
+install.packages('googlesheets4')
+install.packages('tidyverse')
+install.packages('leaflet')
+install.packages('sf')
+install.packages('tigris')
 library(googlesheets4)
 gs4_deauth()
 library(tidyverse)
@@ -15,6 +15,11 @@ library(tigris)
 default.crs = sf::st_crs(4326)
 fairfax.roads <- roads("VA", "Fairfax city")
 fairfax.county <- county_subdivisions("VA", "Fairfax city")
+
+ggplot() +
+  geom_sf(data = fairfax.county) +
+  geom_sf(data = fairfax.roads) +
+  theme_void()
 
 ### Choose between Bus Stops or City Development projects
 # Bus Stops
@@ -40,7 +45,7 @@ calls.full$day <- day(calls.full$date)
 calls.full$month <- substr(calls.full$date, 6, 7)
 calls <- subset(calls.full, !is.na(calls.full$lat))
 # filter since COVID began
-calls <- subset(calls, calls$date > '2020-03-01')
+calls <- subset(calls, calls$date > 'yyyy-mm-dd')
 # convert to a map object
 pts.calls <- st_as_sf(calls, coords = c("lon", "lat"), crs=default.crs)
 
@@ -56,26 +61,44 @@ crime.full$month <- substr(crime.full$date.report, 6, 7)
 crime <- subset(crime.full, !is.na(crime.full$lat))
 # filter since COVID began
 crime <- subset(crime, crime$date > '2020-03-01')
+# (optional) filter for specific crime types
+crime <- subset(crime, crime$crime.description == 'xxx')
 # convert to a map object
 pts.crime <- st_as_sf(crime, coords = c("lon", "lat"), crs=default.crs)
 
+
 ### Calculate stats and buffers for bus or developments
-bus.mean <- as.numeric(mean(st_length(st_nearest_points(pts.bus, pts.calls))))
-bus.sd <- as.numeric(sd(st_length(st_nearest_points(pts.bus, pts.calls))))
-bus.buffer <- st_buffer(pts.bus, 25)
+facility.mean <- as.numeric(mean(st_length(st_nearest_points(pts.bus, pts.calls))))
+facility.sd <- as.numeric(sd(st_length(st_nearest_points(pts.bus, pts.calls))))
+facility.buffer <- st_buffer(pts.bus, 25)
 # test your buffers with a quick map
 leaflet(bus.stops) %>%
   addTiles() %>%
   addMarkers(lng = ~LONGITUDE, lat = ~LATITUDE, 
              clusterOptions = markerClusterOptions()) %>%
-  addPolygons(data = bus.buffer)
+  addPolygons(data = facility.buffer)
 
 ### Join the calls or crime to the buffers
-bus.calls <- st_join(pts.calls, left = FALSE, bus.buffer["Bus"])
+facility.activity <- st_join(pts.calls, left = FALSE, bus.buffer["Bus"])
 
 
 # Analyze the activity types
 # summary tables!
+summary1 <- facility.activity %>%
+  group_by(type) %>%
+  summarise(count = n()) %>%
+  mutate(PCT = round(count/sum(count)*100,2))
+
+summary2 <- facility.activity %>%
+  group_by(Bus) %>%
+  summarise(count = n()) %>%
+  mutate(PCT = round(count/sum(count)*100,2))
+
+summary3 <- facility.activity %>%
+  group_by(Bus, type) %>%
+  summarise(count = n()) %>%
+  mutate(PCT = round(count/sum(count)*100,2))
+
 # Analyze the hotspots
 # Analyze the hour, day of week, month of year, and year
 
