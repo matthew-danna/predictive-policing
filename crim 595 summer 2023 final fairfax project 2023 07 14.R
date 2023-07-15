@@ -41,18 +41,19 @@ calls.full$day <- day(calls.full$date)
 calls.full$month <- substr(calls.full$date, 6, 7)
 calls <- subset(calls.full, !is.na(calls.full$lat))
 
+calls <- subset(calls, calls$date > '2020-03-01')
+
 pts.calls <- st_as_sf(calls, coords = c("lon", "lat"), crs=default.crs)
 
 # Crime
 id.crime <- "1Hdhg5dvPsb28gvkroUU99AKPcGu8rVCp"
 crime.full <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id.crime))
-
 crime.full$date.report <- as.Date(crime.full$date.report)
 crime.full$dow <- weekdays(crime.full$date.report)
 crime.full$day <- day(crime.full$date.report)
 crime.full$month <- substr(crime.full$date.report, 6, 7)
 crime <- subset(crime.full, !is.na(crime.full$lat))
-
+crime <- crime %>% filter(date.report > '2020-03-01')
 pts.crime <- st_as_sf(crime, coords = c("lon", "lat"), crs=default.crs)
 
 ### Step 4
