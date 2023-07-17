@@ -82,6 +82,11 @@ summary2 <- facility.activity %>%
   mutate(PCT = round(count/sum(count)*100,2))
 
 
+ggplot() +
+  geom_sf(data = fairfax.county) +
+  geom_sf(data = fairfax.roads) +
+  geom_sf(data = pts.calls) +
+  theme_void()
 
 
 
