@@ -176,7 +176,8 @@ graph3 <- ggplot(calls.day.time, aes(hour, dow, fill = count)) +
 
 graph + 
   labs(x = "Hour of Day", y = "Day of Week", title = "Temporal Topology", subtitle = "By: Me", caption = "Source: ...") +
-  theme_bw()
+  theme_bw() +
+  theme(axis.text = element_text(angle = 90))
 
 graph + 
   labs(x = "Hour of Day", y = "Day of Week", title = "Temporal Topology", subtitle = "By: Me", caption = "Source: ...") +
