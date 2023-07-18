@@ -54,7 +54,7 @@ calls <- subset(calls, calls$date > 'yyyy-mm-dd')
 calls <- subset(calls, calls$type == 'MENTAL' | calls$type == 'SUSPICIOUS' |
                   calls$type == 'DOMESTIC' | calls$type == 'ASSAULT' |
                   calls$type == 'SEXUAL ASSAULT/RAPE')
-
+# OPTIONAL - to get rid of blank call types
 calls <- subset(calls, !is.na(calls$type))
 
 pts.calls <- st_as_sf(calls, coords = c("lon", "lat"), crs=default.crs)
@@ -127,7 +127,7 @@ facility.activity <- facility.activity[c(1:13,23)]
 names(facility.activity) <- c("date", "time", "number", "type", "hour", "year", "ID", 
                               "dow", "day", "month", "name", "lat", "lon", "geometry")
 
-### Step 5
+### Step 5 BEHAVIOR
 # for crime:
 summary1 <- facility.activity %>%
   group_by(crime.description) %>%
@@ -152,7 +152,15 @@ summary2 <- facility.activity %>%
   summarise(count = n()) %>%
   mutate(PCT = round(count/sum(count)*100,2))
 
-##### Spatial
+# based on this analysis, 
+# you may choose to subset your data to only map and graph the 'top' types
+# for example:
+facility.activity <- subset(facility.activity, 
+                            facility.activity$crime.description == 'DRUNKENNESS' |
+                              facility.activity$crime.description == 'SIMPLE ASSAULT' |
+                              facility.activity$crime.description == 'POCKET PICKING')
+
+##### Step 6 SPATIAL
 # Cluster map example:
 leaflet(facility.activity) %>%
   addProviderTiles("CartoDB.DarkMatter") %>%
@@ -182,9 +190,9 @@ ggplot() +
   theme_void() + 
   theme(plot.title = element_text(size = 20, hjust=.5), plot.subtitle = element_text(size = 8, hjust=.5, margin=margin(2, 0, 5, 0))) + 
   labs(title = "Fairfax, VA", subtitle = "Calls since COVID near bus stops") +
-  facet_wrap(~ type, nrow = 3)
+  facet_wrap(~ crime.description, nrow = 3)
 
-# Temporal examples
+##### Step 7 TEMPORAL
 # overall
 activity.day.time <- facility.activity %>%
   group_by(dow, hour) %>%
@@ -200,16 +208,16 @@ ggplot(activity.day.time, aes(hour, dow, fill = count)) +
 
 # By activity type:
 activity.type.day.time <- facility.activity %>%
-  group_by(type, dow, hour) %>%
+  group_by(crime.description, dow, hour.report) %>%
   summarise(count = n())
-activity.type.day.time <- subset(activity.type.day.time, !is.na(activity.type.day.time$hour))
+activity.type.day.time <- subset(activity.type.day.time, !is.na(activity.type.day.time$hour.report))
 
-ggplot(activity.type.day.time, aes(hour, dow, fill = count)) +
+ggplot(activity.type.day.time, aes(hour.report, dow, fill = count)) +
   geom_tile(color = "black", lwd = .5, linetype = 1) + 
   geom_text(aes(label = count), color = "black", size = 2.5) +
   scale_fill_gradient(low = "white", high = "red") +
   theme(legend.position = "none") +
   coord_fixed() +
-  facet_wrap(~ type, nrow = 10)
+  facet_wrap(~ crime.description, nrow = 10)
 
 
