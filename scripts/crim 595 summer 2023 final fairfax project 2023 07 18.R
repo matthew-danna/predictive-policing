@@ -14,10 +14,10 @@ library(tigris)
 ### Step 1
 default.crs = sf::st_crs(4326)
 fairfax.roads <- roads("VA", "Fairfax city")
-fairfax.county <- county_subdivisions("VA", "Fairfax city")
+fairfax.city <- county_subdivisions("VA", "Fairfax city")
 
 ggplot() +
-  geom_sf(data = fairfax.county) +
+  geom_sf(data = fairfax.city) +
   geom_sf(data = fairfax.roads) +
   theme_void()
 
@@ -118,24 +118,61 @@ names(facility.activity) <- c("date", "time", "number", "type", "hour", "year", 
                               "dow", "day", "month", "name", "lat", "lon", "geometry")
 
 ### Step 5
+# for crime:
 summary1 <- facility.activity %>%
   group_by(crime.description) %>%
   summarise(count = n()) %>%
   mutate(PCT = round(count/sum(count)*100,2))
 
-summary2 <- facility.activity %>%
-  group_by(Bus, crime.description) %>%
+# for calls:
+summary1 <- facility.activity %>%
+  group_by(type) %>%
   summarise(count = n()) %>%
   mutate(PCT = round(count/sum(count)*100,2))
 
+# for crime:
+summary2 <- facility.activity %>%
+  group_by(name, crime.description) %>%
+  summarise(count = n()) %>%
+  mutate(PCT = round(count/sum(count)*100,2))
 
-ggplot() +
-  geom_sf(data = fairfax.county) +
-  geom_sf(data = fairfax.roads) +
-  geom_sf(data = pts.calls) +
-  theme_void()
+# for calls:
+summary2 <- facility.activity %>%
+  group_by(name, type) %>%
+  summarise(count = n()) %>%
+  mutate(PCT = round(count/sum(count)*100,2))
 
-# Spatial
+##### Spatial
+# Cluster map example:
+leaflet(facility.activity) %>%
+  addProviderTiles("CartoDB.DarkMatter") %>%
+  addMarkers(lng = ~lon, lat = ~lat, 
+             popup = paste(
+               "Call Type: ", facility.activity$type, "<br>",
+               "Date:", facility.activity$date), 
+             clusterOptions = markerClusterOptions()) %>%
+  addPolygons(data = fairfax.city)
+
+# Hotspot map examples:
+ggplot() + 
+  geom_sf(data = fairfax.city, color = "white") +
+  geom_sf(data = fairfax.roads, inherit.aes = FALSE, color = "grey", size = .3, alpha = .5) + 
+  geom_sf(data = facility.buffer) +
+  geom_point(aes(x = lon, y = lat, color = "red"), data = facility.activity, alpha = 0.01, size = 1.5) +  
+  theme_void() + 
+  theme(plot.title = element_text(size = 20, hjust=.5), plot.subtitle = element_text(size = 8, hjust=.5, margin=margin(2, 0, 5, 0))) + 
+  labs(title = "Fairfax, VA", subtitle = "Calls since COVID near bus stops")
+
+
+
+ggplot() + 
+  geom_sf(data = fairfax.roads, inherit.aes = FALSE, color = "grey", size = .3, alpha = .5) + 
+  geom_point(aes(x = lon, y = lat, color = "red"), data = calls, alpha = 0.1, size = 1.5) +  
+  theme_void() + 
+  theme(plot.title = element_text(size = 20, hjust=.5), plot.subtitle = element_text(size = 8, hjust=.5, margin=margin(2, 0, 5, 0))) + 
+  labs(title = "Fairfax, VA", subtitle = "Calls and streets") +
+  facet_wrap(~ year, nrow = 3) +
+  theme(legend.position = "none")
 
 # Temporal
 
