@@ -43,7 +43,12 @@ calls.full$day <- day(calls.full$date)
 calls.full$month <- substr(calls.full$date, 6, 7)
 calls <- subset(calls.full, !is.na(calls.full$lat))
 
-calls <- subset(calls, calls$date > '2020-03-01')
+# subset 'since COVID' if analyzing bus stops
+calls <- subset(calls, calls$date > 'yyyy-mm-dd')
+# OPTIONAL - subsetting for specific call types
+calls <- subset(calls, calls$type == 'MENTAL' | calls$type == 'SUSPICIOUS' |
+                  calls$type == 'DOMESTIC' | calls$type == 'ASSAULT' |
+                  calls$type == 'SEXUAL ASSAULT/RAPE')
 
 pts.calls <- st_as_sf(calls, coords = c("lon", "lat"), crs=default.crs)
 
@@ -55,18 +60,34 @@ crime.full$dow <- weekdays(crime.full$date.report)
 crime.full$day <- day(crime.full$date.report)
 crime.full$month <- substr(crime.full$date.report, 6, 7)
 crime <- subset(crime.full, !is.na(crime.full$lat))
-crime <- crime %>% filter(date.report > '2020-03-01')
+
+# subset 'since COVID' if analyzing bus stops
+crime <- crime %>% filter(date.report > 'yyyy-mm-dd')
+
+# OPTIONAL - subsetting for specific crime types
+crime <- crime %>% filter(crime.description == 'ROBBERY')
+
 pts.crime <- st_as_sf(crime, coords = c("lon", "lat"), crs=default.crs)
 
 ### Step 4
+# Choose one of these 4
 facility.mean <- as.numeric(mean(st_length(st_nearest_points(pts.bus, pts.crime))))
+facility.mean <- as.numeric(mean(st_length(st_nearest_points(pts.bus, pts.calls))))
+facility.mean <- as.numeric(mean(st_length(st_nearest_points(pts.city, pts.crime))))
+facility.mean <- as.numeric(mean(st_length(st_nearest_points(pts.city, pts.calls))))
+
+# Chose one of these 4
 facility.sd <- as.numeric(sd(st_length(st_nearest_points(pts.city, pts.calls))))
+facility.sd <- as.numeric(sd(st_length(st_nearest_points(pts.city, pts.crime))))
+facility.sd <- as.numeric(sd(st_length(st_nearest_points(pts.bus, pts.calls))))
+facility.sd <- as.numeric(sd(st_length(st_nearest_points(pts.bus, pts.crime))))
 
-facility.buffer <- st_buffer(pts.bus, 43.21)
+# UPDATE THE NUMBER TO A BUFFER THAT WORKS FOR YOUR DATA!
+facility.buffer <- st_buffer(pts.bus, 230)
 
-leaflet(city.dev) %>%
+leaflet(bus.stops) %>%
   addTiles() %>%
-  addMarkers(lng = ~Lon, lat = ~Lat, 
+  addMarkers(lng = ~LONGITUDE, lat = ~LATITUDE, 
              clusterOptions = markerClusterOptions()) %>%
   addPolygons(data = facility.buffer)
 
