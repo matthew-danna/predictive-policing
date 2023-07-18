@@ -151,7 +151,8 @@ leaflet(facility.activity) %>%
                "Call Type: ", facility.activity$type, "<br>",
                "Date:", facility.activity$date), 
              clusterOptions = markerClusterOptions()) %>%
-  addPolygons(data = fairfax.city)
+  addPolygons(data = fairfax.city, fillColor = 'white') %>%
+  addPolygons(data = facility.buffer)
 
 # Hotspot map examples:
 ggplot() + 
@@ -165,14 +166,6 @@ ggplot() +
 
 
 
-ggplot() + 
-  geom_sf(data = fairfax.roads, inherit.aes = FALSE, color = "grey", size = .3, alpha = .5) + 
-  geom_point(aes(x = lon, y = lat, color = "red"), data = calls, alpha = 0.1, size = 1.5) +  
-  theme_void() + 
-  theme(plot.title = element_text(size = 20, hjust=.5), plot.subtitle = element_text(size = 8, hjust=.5, margin=margin(2, 0, 5, 0))) + 
-  labs(title = "Fairfax, VA", subtitle = "Calls and streets") +
-  facet_wrap(~ year, nrow = 3) +
-  theme(legend.position = "none")
 
 # Temporal
 
