@@ -95,18 +95,27 @@ leaflet(bus.stops) %>%
              clusterOptions = markerClusterOptions()) %>%
   addPolygons(data = facility.buffer)
 
+# Chose one of these 4
 facility.activity <- st_join(pts.crime, left = FALSE, facility.buffer["Bus"])
+facility.activity <- st_join(pts.calls, left = FALSE, facility.buffer["Bus"])
 facility.activity <- st_join(pts.calls, left = FALSE, facility.buffer["Property"])
+facility.activity <- st_join(pts.crime, left = FALSE, facility.buffer["Property"])
 
 ##### NEW - join the original table to the new table
+# Only run one of these
 facility.activity <- facility.activity %>% left_join(crime, by = 'ID')
+facility.activity <- facility.activity %>% left_join(calls, by = 'ID')
 #### now only keep the columns you need
+# for crime:
 facility.activity <- facility.activity[c(1:23,43)]
-### and then clean up the column names
 names(facility.activity) <- c("number", "date1", "time1", "type", "date2", "time2", "statute", "crime", 
                               "crime.description", "statute.description", "date.report", "time.report",
-                              "hour1", "hour2", "hour.report", "year", "ID", "dow", "day", "month", "Bus", 
+                              "hour1", "hour2", "hour.report", "year", "ID", "dow", "day", "month", "name", 
                               "lat", "lon", "geometry")
+# for calls:
+facility.activity <- facility.activity[c(1:13,23)]
+names(facility.activity) <- c("date", "time", "number", "type", "hour", "year", "ID", 
+                              "dow", "day", "month", "name", "lat", "lon", "geometry")
 
 ### Step 5
 summary1 <- facility.activity %>%
