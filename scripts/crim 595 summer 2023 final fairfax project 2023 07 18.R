@@ -26,6 +26,10 @@ ggplot() +
 bus.stops <- read_sheet('https://docs.google.com/spreadsheets/d/1OLjEjJJiyjuu5arluv2oiorM4TqzqIk7PQJ9g4Ichvo')
 pts.bus <- st_as_sf(bus.stops, coords = c("LONGITUDE", "LATITUDE"), crs=default.crs)
 
+# alternative way to get the bus stop data:
+id.bus <- "1UDSghDGA5u5z9VaWnqfIy1_CvpYyTXJz"
+bus.stops <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id.bus))
+
 # City Development Projects
 city.dev <- read_sheet('https://docs.google.com/spreadsheets/d/1bvJCJSDmoayfMljJs9ajSb4PN4waE5MKDoz9vewyax0')
 city.dev$Lat <- as.numeric(city.dev$Lat)
