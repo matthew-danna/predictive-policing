@@ -184,8 +184,32 @@ ggplot() +
   labs(title = "Fairfax, VA", subtitle = "Calls since COVID near bus stops") +
   facet_wrap(~ type, nrow = 3)
 
-# Temporal
+# Temporal examples
+# overall
+activity.day.time <- facility.activity %>%
+  group_by(dow, hour) %>%
+  summarise(count = n())
+activity.day.time <- subset(activity.day.time, !is.na(activity.day.time$hour))
 
+ggplot(activity.day.time, aes(hour, dow, fill = count)) +
+  geom_tile(color = "black", lwd = .5, linetype = 1) + 
+  geom_text(aes(label = count), color = "black", size = 2.5) +
+  scale_fill_gradient(low = "white", high = "red") +
+  theme(legend.position = "none") +
+  coord_fixed()
 
+# By activity type:
+activity.type.day.time <- facility.activity %>%
+  group_by(type, dow, hour) %>%
+  summarise(count = n())
+activity.type.day.time <- subset(activity.type.day.time, !is.na(activity.type.day.time$hour))
+
+ggplot(activity.type.day.time, aes(hour, dow, fill = count)) +
+  geom_tile(color = "black", lwd = .5, linetype = 1) + 
+  geom_text(aes(label = count), color = "black", size = 2.5) +
+  scale_fill_gradient(low = "white", high = "red") +
+  theme(legend.position = "none") +
+  coord_fixed() +
+  facet_wrap(~ type, nrow = 10)
 
 
