@@ -24,11 +24,12 @@ ggplot() +
 ### Step 2
 # Bus Stops
 bus.stops <- read_sheet('https://docs.google.com/spreadsheets/d/1OLjEjJJiyjuu5arluv2oiorM4TqzqIk7PQJ9g4Ichvo')
-pts.bus <- st_as_sf(bus.stops, coords = c("LONGITUDE", "LATITUDE"), crs=default.crs)
 
 # alternative way to get the bus stop data:
 id.bus <- "1UDSghDGA5u5z9VaWnqfIy1_CvpYyTXJz"
 bus.stops <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id.bus))
+
+pts.bus <- st_as_sf(bus.stops, coords = c("LONGITUDE", "LATITUDE"), crs=default.crs)
 
 # City Development Projects
 city.dev <- read_sheet('https://docs.google.com/spreadsheets/d/1bvJCJSDmoayfMljJs9ajSb4PN4waE5MKDoz9vewyax0')
@@ -74,7 +75,11 @@ crime <- crime %>% filter(date.report > 'yyyy-mm-dd')
 crime <- crime %>% filter(crime.description == 'ROBBERY')
 
 crime.list <- c("ROBBERY", "SIMPLE ASSAULT", "DRUNKENNESS", "ARSON", "POCKET PICKING")
+crime.nolist <- c("ALL OTHER OFFENSES", "PEEPING TOM")
+`%notin%` <- Negate(`%in%`)
+
 crime <- crime %>% filter(crime.description %in% crime.list)
+crime <- crime %>% filter(crime.description %notin% crime.nolist)
 
 pts.crime <- st_as_sf(crime, coords = c("lon", "lat"), crs=default.crs)
 
@@ -178,7 +183,6 @@ ggplot() +
   theme(plot.title = element_text(size = 20, hjust=.5), plot.subtitle = element_text(size = 8, hjust=.5, margin=margin(2, 0, 5, 0))) + 
   labs(title = "Fairfax, VA", subtitle = "Calls since COVID near bus stops") +
   facet_wrap(~ type, nrow = 3)
-
 
 # Temporal
 
