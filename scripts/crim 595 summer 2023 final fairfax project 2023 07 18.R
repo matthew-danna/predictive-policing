@@ -54,6 +54,8 @@ calls <- subset(calls, calls$type == 'MENTAL' | calls$type == 'SUSPICIOUS' |
                   calls$type == 'DOMESTIC' | calls$type == 'ASSAULT' |
                   calls$type == 'SEXUAL ASSAULT/RAPE')
 
+calls <- subset(calls, !is.na(calls$type))
+
 pts.calls <- st_as_sf(calls, coords = c("lon", "lat"), crs=default.crs)
 
 # Crime
@@ -70,6 +72,9 @@ crime <- crime %>% filter(date.report > 'yyyy-mm-dd')
 
 # OPTIONAL - subsetting for specific crime types
 crime <- crime %>% filter(crime.description == 'ROBBERY')
+
+crime.list <- c("ROBBERY", "SIMPLE ASSAULT", "DRUNKENNESS", "ARSON", "POCKET PICKING")
+crime <- crime %>% filter(crime.description %in% crime.list)
 
 pts.crime <- st_as_sf(crime, coords = c("lon", "lat"), crs=default.crs)
 
@@ -164,7 +169,15 @@ ggplot() +
   theme(plot.title = element_text(size = 20, hjust=.5), plot.subtitle = element_text(size = 8, hjust=.5, margin=margin(2, 0, 5, 0))) + 
   labs(title = "Fairfax, VA", subtitle = "Calls since COVID near bus stops")
 
-
+ggplot() + 
+  geom_sf(data = fairfax.city, color = "white") +
+  geom_sf(data = fairfax.roads, inherit.aes = FALSE, color = "grey", size = .3, alpha = .5) + 
+  geom_sf(data = facility.buffer) +
+  geom_point(aes(x = lon, y = lat, color = "red"), data = facility.activity, alpha = 0.01, size = 1.5) +  
+  theme_void() + 
+  theme(plot.title = element_text(size = 20, hjust=.5), plot.subtitle = element_text(size = 8, hjust=.5, margin=margin(2, 0, 5, 0))) + 
+  labs(title = "Fairfax, VA", subtitle = "Calls since COVID near bus stops") +
+  facet_wrap(~ type, nrow = 3)
 
 
 # Temporal
