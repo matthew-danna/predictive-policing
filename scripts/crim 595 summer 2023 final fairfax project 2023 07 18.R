@@ -97,6 +97,7 @@ facility.sd <- as.numeric(sd(st_length(st_nearest_points(pts.bus, pts.calls))))
 facility.sd <- as.numeric(sd(st_length(st_nearest_points(pts.bus, pts.crime))))
 
 # UPDATE THE NUMBER TO A BUFFER THAT WORKS FOR YOUR DATA!
+### consider buffers from some of the research (Ariel & Partridge, 2017; Gerell, 2018)
 facility.buffer <- st_buffer(pts.bus, 230)
 
 leaflet(bus.stops) %>%
@@ -183,7 +184,7 @@ ggplot() +
   labs(title = "Fairfax, VA", subtitle = "Calls since COVID near bus stops")
 
 ggplot() + 
-  geom_sf(data = fairfax.city, color = "white") +
+  geom_sf(data = fairfax.city, fill = "white") +
   geom_sf(data = fairfax.roads, inherit.aes = FALSE, color = "grey", size = .3, alpha = .5) + 
   geom_sf(data = facility.buffer) +
   geom_point(aes(x = lon, y = lat, color = "red"), data = facility.activity, alpha = 0.01, size = 1.5) +  

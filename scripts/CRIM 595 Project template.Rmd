@@ -11,6 +11,8 @@ There's a [useful link here](https://www.rforecology.com/post/how-to-use-rmarkdo
 
 And here's [another one](https://sage-fenglisu-c38dfb.netlify.app/). 
 
+[Here's a great link](https://bookdown.org/yihui/rmarkdown-cookbook/kable.html) for creating tables as visuals in your file.
+
 Both of the examples above show you how to hyperlink text. That's useful when you want to cite something, without providing the URL in the text.
 
 These are different heading styles. When you 'knit' this template, you see how they differ:
